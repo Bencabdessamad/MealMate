@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View, ScrollView, Pressable } from "react-native";
 import React, { useState } from "react";
+import { View, Text, ScrollView, Pressable } from "react-native";
 import moment from "moment";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const HomeScreen = () => {
   const currentDate = moment();
@@ -8,6 +10,7 @@ const HomeScreen = () => {
   const [date, setDate] = useState("");
   const [nextDate, setNextDate] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+  const navigation = useNavigation();
 
   const renderWeekDates = (startOfWeek) => {
     let weekDates = [];
@@ -16,19 +19,18 @@ const HomeScreen = () => {
       const formattedDate = date.format("ddd DD");
       const isCurrentDate = date.isSame(currentDate, "days");
       weekDates.push(
-        <View style={{ flexDirection: "row", gap: 12, marginVertical: 10 }}>
+        <View key={i} style={{ flexDirection: "row", marginBottom: 10 }}>
           <View
             style={[
               {
-                height: 40,
                 width: 40,
+                height: 40,
                 borderRadius: 20,
-                backgroundColor: "white",
-                marginVertical: 10,
+                backgroundColor: isCurrentDate ? "#2B547E" : "white",
                 justifyContent: "center",
                 alignItems: "center",
+                marginVertical: 10,
               },
-              isCurrentDate && { backgroundColor: "black" },
             ]}
           >
             <Text
@@ -51,15 +53,18 @@ const HomeScreen = () => {
             </Text>
           </View>
           <Pressable
-            style={[
-              {
-                backgroundColor: "white",
-                borderRadius: 8,
-                padding: 10,
-                width: "85%",
-                height: 80,
-              },
-            ]}
+            onPress={() =>
+              navigation.navigate("Menu", {
+                date: date.format("ddd") + "" + date.format("DD"),
+              })
+            }
+            style={{
+              flex: 1,
+              backgroundColor: "white",
+              borderRadius: 8,
+              padding: 10,
+              marginLeft: 12,
+            }}
           >
             <Text
               style={{
@@ -67,10 +72,19 @@ const HomeScreen = () => {
                 fontWeight: "600",
                 fontSize: 12,
                 color: "#B0CFDE",
+                marginBottom: 5,
               }}
             >
               There is no Menu
             </Text>
+            <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+              <Pressable style={{ marginRight: 10 }}>
+                <Ionicons name="copy" size={20} color="#007AFF" />
+              </Pressable>
+              <Pressable>
+                <Ionicons name="trash-outline" size={20} color="#FF3B30" />
+              </Pressable>
+            </View>
           </Pressable>
         </View>
       );
@@ -82,16 +96,14 @@ const HomeScreen = () => {
     let weeks = [];
     for (let i = 0; i < numWeeks; i++) {
       weeks.push(
-        <View key={i}>
-          <Text>
+        <View key={i} style={{ marginBottom: 20 }}>
+          <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 10 }}>
             {startOfWeek
               .clone()
               .add(i * 7, "days")
               .format("DD MMM")}
           </Text>
-          <Text>
-            {renderWeekDates(startOfWeek.clone().add(i * 7, "days"))}{" "}
-          </Text>
+          {renderWeekDates(startOfWeek.clone().add(i * 7, "days"))}
         </View>
       );
     }
@@ -99,8 +111,8 @@ const HomeScreen = () => {
   };
 
   return (
-    <ScrollView style={{ marginTop: 50 }}>
-      <View style={{ flex: 1, padding: 12 }}>{renderWeeks(3)}</View>
+    <ScrollView style={{ marginTop: 50, paddingHorizontal: 12 }}>
+      {renderWeeks(3)}
     </ScrollView>
   );
 };
